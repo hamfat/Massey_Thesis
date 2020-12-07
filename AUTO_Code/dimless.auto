@@ -1,0 +1,44 @@
+!--------------------------------------------------------------
+
+!------------------------------------------
+! run "auto dimless.auto" in the terminal
+!--------------------------------------------------------------
+r1=run('dimless')
+#r1.writeRawFilename('eq_curve.dat')
+
+r2=run(r1("HB1"),ISP=2,ICP=[1,11],IPS=2)
+r2.writeRawFilename('period_curve.dat')
+
+r10=r1+r2
+!plot(r10) produce the codimension-1 bifurcation diagram
+plot(r10)
+
+print "\n***curve of HB***"
+r3=run(r1("HB1"),ISW=2,ICP=[1,2],STOP=[],NMX=2000)+run(r1("HB1"),ISW=2,ICP=[1,2],STOP=[],DS="-",NMX=2000)
+r3.writeRawFilename('HB_curve.dat')
+
+print "\n***saddle-node curves***"
+r4=run(r1("LP1"),ISW=2,ICP=[1,2],STOP=[],NMX=500)+run(r1("LP1"),ISW=2,ICP=[1,2],STOP=[],NMX=500,DS='-')
+r4.writeRawFilename('SN_curve.dat')
+
+print "\n***curve of periodic orbit***"
+t2=run(r1("HB1"),ICP=[1,11],ISW=-1,IPS=2)
+t3=run(t2("LP1"),ISW=2,ICP=[1,2,11])
+t4=run(t3,NMX=1000,DS='-')+run(t3,NMX=1000)
+t4.writeRawFilename('LPC_curve.dat')
+plot t4
+
+print "\n***curve of homoclinic orbit***"
+r9=run(r1("HB1"),ISP=2,ICP=[1,11],IPS=2,UZSTOP={11:2500})
+print "\n***homoclinic_Highper***"
+rHigPer =run(r9("UZ1"),ICP=[1,2],DS='-',NMX=1000)+run(r9("UZ1"),ICP=[1,2],NMX=1000)
+rHigPer.writeRawFilename('HOM_curve.dat')
+
+print "\n***codimension-2 diagram***"
+r12=r3+r4+t4+rHigPer
+r12.writeRawFilename('codimension-2.dat')
+plot(r12)
+
+
+print "\n***Clean the directory***"
+clean()
